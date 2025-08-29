@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Garbage Detection Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+<script>
+    const map = L.map('map').setView([25.62, 85.1], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Store markers by detection ID
+    const markers = {};
+
+    var marker;
+
+    {% for d in detections %}
+        marker = L.marker([{{ d.latitude }}, {{ d.longitude }}])
+            .addTo(map)
+            .bindPopup(`
+                <b>ID:</b> #{{ d.id }}<br>
+                <b>Status:</b> {{ d.status|capfirst }}<br>
+                <b>Time:</b> {{ d.detected_at|date:"Y-m-d H:i" }}
+            `);
+        markers[{{ d.id }}] = marker;
+    {% endfor %}
+</script>
+<script>
+    window.removeMarker = function(id) {
+        if (markers[id]) {
+            map.removeLayer(markers[id]);
+            delete markers[id];
+        }
+    }
+</script>
+
+
+
+</body>
+</html>
+

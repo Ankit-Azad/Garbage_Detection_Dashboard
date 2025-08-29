@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detection Dashboard</title>
+    <link rel="stylesheet" href="{% static 'detections/style.css' %}">
+</head>
+<body>
+    {% csrf_token %}
+
+    {% if user.is_authenticated %}
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+    {% endif %}
+    <a href="{% url 'map' %}" class="map-btn">🗺️ View Map</a>
+
+<div class="container">
+    <h1>🗂️ Detection Dashboard</h1>
+    <p style="text-align: center; font-style: italic;">
+      Logged in as: {{ request.user.username }} (
+      {% if is_supervisor %}
+        Supervisor
+      {% else %}
+        Worker
+      {% endif %}
+      )
+    </p>
+    <div class="card-grid">
+        {% for detection in detections %}
+            <div class="detection-card {% if detection.status == 'cleaned' %}cleaned-bg{% endif %}">
+                <img src="data:image/jpeg;base64,{{ detection.image_base64 }}" alt="Detection Frame">
+
+                <div class="meta">
+                    <p><span class="key">ID:</span> #{{ detection.id }}</p>
+                    <p><span class="key">Timestamp:</span> {{ detection.detected_at }}</p>
+                    <p><span class="key">Ward:</span> {{ detection.ward_number }}</p>
+                    <p><span class="key">Location:</span> ({{ detection.latitude }}, {{ detection.longitude }})</p>
+
+                    <p>
+                        <span class="key">Status:</span>
+                        {% if is_supervisor %}
+                            <button type="button"
+                                    class="status-btn {% if detection.status == 'cleaned' %}cleaned{% endif %}"
+                                    data-id="{{ detection.id }}">
+                                {{ detection.status|capfirst }}
+                            </button>
+                        {% else %}
+                            <span class="{{ detection.status }}">{{ detection.status|capfirst }}</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.status-btn').forEach(button => {
+    button.addEventListener('click', () => {
+        const id = button.getAttribute('data-id');
+        
+
+        fetch("{% url 'update_status' %}", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: `id=${id}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status) {
+                button.textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+                button.classList.toggle('cleaned', data.status === 'cleaned');
+
+                // Optional: update card background
+                const card = button.closest('.detection-card');
+                if (card) {
+                    if (data.status === 'cleaned') {
+                        card.classList.add('cleaned-bg');
+                    } else {
+                        card.classList.remove('cleaned-bg');
+                    }
+                }
+                // ✅ Remove from map if status is cleaned
+        if (data.status === 'cleaned' && typeof window.removeMarker === 'function') {
+            window.removeMarker(id);
+        }
+            }
+        });
+    });
+});
+
+</script>
+
+
+</body>
+</html>

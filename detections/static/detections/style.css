@@ -1,0 +1,96 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.detection-card {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.detection-card:hover {
+    transform: scale(1.02);
+}
+
+.detection-card img {
+    width: 100%;
+    display: block;
+    border-bottom: 1px solid #eee;
+}
+
+.meta {
+    padding: 15px;
+}
+
+.meta p {
+    margin: 6px 0;
+    font-size: 0.95em;
+    color: #444;
+}
+
+.key {
+    font-weight: 600;
+    color: #222;
+}
+
+.detection-card.cleaned-bg {
+    background-color: #e9fbe9; /* soft green */
+    border: 1px solid #b2e2b2;
+}
+
+.status-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #f39c12; /* orange for pending */
+    color: white;
+}
+
+.status-btn.cleaned {
+    background-color: #2ecc71; /* green for cleaned */
+}
+
+.cleaned, .pending {
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.map-btn {
+    float: right;
+    padding: 8px 14px;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+.map-btn:hover {
+    background-color: #2980b9;
+}
